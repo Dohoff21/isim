@@ -1,0 +1,120 @@
+/* Mobile-First Layout Styles */
+.mobile-app-bar {
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+
+.app-title {
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.version-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mobile-main-content {
+    margin-top: 64px; /* Space for fixed app bar */
+    min-height: calc(100vh - 64px);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    overflow-x: hidden;
+}
+
+.content-container {
+    padding: 0;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Remove default body margins and set full height */
+::deep body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', 'Arial', sans-serif;
+    background: #f5f7fa;
+    overflow-x: hidden;
+}
+
+::deep html {
+    height: 100%;
+}
+
+::deep #app {
+    height: 100%;
+    min-height: 100vh;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .mobile-app-bar {
+        height: 56px;
+    }
+    
+    .mobile-main-content {
+        margin-top: 56px;
+        min-height: calc(100vh - 56px);
+    }
+    
+    .app-title {
+        font-size: 1.1rem;
+    }
+    
+    .version-text {
+        font-size: 0.7rem;
+    }
+    
+    .content-container {
+        padding: 0;
+    }
+}
+
+/* Tablet and larger screens */
+@media (min-width: 769px) {
+    .content-container {
+        max-width: 1200px;
+        padding: 0 1rem;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .mobile-app-bar {
+        background: #1976d2;
+        border-bottom: 2px solid #ffffff;
+    }
+    
+    .mobile-main-content {
+        background: #ffffff;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .mobile-app-bar {
+        background: #1976d2;
+    }
+    
+    .mobile-main-content {
+        background: #f5f7fa;
+    }
+}
+
+/* Touch-friendly scrolling */
+.content-container {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Focus management for accessibility */
+.mobile-app-bar :focus {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+}

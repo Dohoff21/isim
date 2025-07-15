@@ -1,0 +1,47 @@
+<MudCard Style="border: 2px solid #bfdbfe; background: #eff6ff; height: 100%;">
+    <MudCardHeader Class="py-2">
+        <CardHeaderContent>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                <MudText Typo="Typo.h6" Style="color: #1e3a8a; font-weight: 600;">Current Event</MudText>
+                <MudChip Color="Color.Primary" Size="Size.Small">Active</MudChip>
+            </MudStack>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent Class="py-2">
+        <MudStack Spacing="1">
+            <MudPaper Class="pa-2">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.body1" Style="font-weight: 600; color: #111827;">
+                        @CurrentEvent.Name
+                    </MudText>
+                    <MudText Typo="Typo.body2" Style="color: #374151; line-height: 1.4;">
+                        @CurrentEvent.Description
+                    </MudText>
+                    <MudText Typo="Typo.caption" Style="color: #6b7280;">
+                        Duration: @CurrentEvent.TrendTime s
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+            
+            <VitalSignsDisplay Parameters="@CurrentEvent.Parameters" />
+            
+            @if (ChecklistItems.Any())
+            {
+                <MudPaper Style="background: #fffbeb; border: 1px solid #fed7aa;" Class="pa-1">
+                    <MudText Typo="Typo.body1" Style="font-weight: 600; color: #92400e;" Class="mb-1">Expected Actions</MudText>
+                    <MudStack Spacing="0">
+                        @foreach (var item in ChecklistItems)
+                        {
+                            <MudText Typo="Typo.caption" Style="color: #b45309;">• @item.Title</MudText>
+                        }
+                    </MudStack>
+                </MudPaper>
+            }
+        </MudStack>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public ScenarioEvent CurrentEvent { get; set; } = null!;
+    [Parameter] public List<ChecklistItem> ChecklistItems { get; set; } = new();
+}

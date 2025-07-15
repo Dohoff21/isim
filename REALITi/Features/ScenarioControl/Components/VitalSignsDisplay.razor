@@ -1,0 +1,77 @@
+<MudPaper Style="background: white; border: 1px solid #e5e7eb;" Class="pa-2">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="mb-2">
+        <MudIcon Icon="Icons.Material.Filled.Monitor" Color="Color.Error" Size="Size.Small" />
+        <MudText Typo="Typo.body1" Style="font-weight: 600; color: #111827;">Patient Vitals</MudText>
+    </MudStack>
+    
+    <MudGrid Spacing="1">
+        <MudItem xs="6">
+            <MudPaper Style="@($"{GetVitalCardStyle(Parameters.HeartRate ?? 0, 60, 100)} min-height: 50px;")" Class="pa-1 text-center d-flex align-center justify-center">
+                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                    <MudIcon Icon="Icons.Material.Filled.Favorite" Style="font-size: 1rem;" />
+                    <MudText Typo="Typo.caption" Style="font-weight: 500; font-size: 0.6rem;">HR</MudText>
+                    <MudText Typo="Typo.h6" Style="font-weight: 700;">@(Parameters.HeartRate?.ToString() ?? "--")</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="6">
+            <MudPaper Style="@($"{GetVitalCardStyle(Parameters.BloodPressureSystolic ?? 0, 90, 140)} min-height: 50px;")" Class="pa-1 text-center d-flex align-center justify-center">
+                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                    <MudIcon Icon="Icons.Material.Filled.Opacity" Style="font-size: 1rem;" />
+                    <MudText Typo="Typo.caption" Style="font-weight: 500; font-size: 0.6rem;">BP</MudText>
+                    <MudText Typo="Typo.body2" Style="font-weight: 700;">
+                        @(Parameters.BloodPressureSystolic?.ToString() ?? "--")/@(Parameters.BloodPressureDiastolic?.ToString() ?? "--")
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="6">
+            <MudPaper Style="@($"{GetVitalCardStyle(Parameters.SpO2 ?? 0, 95, 100)} min-height: 50px;")" Class="pa-1 text-center d-flex align-center justify-center">
+                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                    <MudIcon Icon="Icons.Material.Filled.Air" Style="font-size: 1rem;" />
+                    <MudText Typo="Typo.caption" Style="font-weight: 500; font-size: 0.6rem;">SpO2</MudText>
+                    <MudText Typo="Typo.h6" Style="font-weight: 700;">@(Parameters.SpO2?.ToString() ?? "--")</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="6">
+            <MudPaper Style="@($"{GetVitalCardStyle((int)(Parameters.Temperature ?? 0), 36, 37)} min-height: 50px;")" Class="pa-1 text-center d-flex align-center justify-center">
+                <MudStack AlignItems="AlignItems.Center" Spacing="0">
+                    <MudIcon Icon="Icons.Material.Filled.Thermostat" Style="font-size: 1rem;" />
+                    <MudText Typo="Typo.caption" Style="font-weight: 500; font-size: 0.6rem;">Temp</MudText>
+                    <MudText Typo="Typo.h6" Style="font-weight: 700;">@(Parameters.Temperature?.ToString("F1") ?? "--")</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudText Typo="Typo.caption" Style="color: #4b5563;" Align="Align.Center" Class="mt-1">
+        RR: <span style="font-weight: 700;">@(Parameters.RespiratoryRate?.ToString() ?? "--")</span>/min
+    </MudText>
+</MudPaper>
+
+@code {
+    [Parameter] public VitalSigns Parameters { get; set; } = null!;
+
+    private string GetVitalCardStyle(int value, int minNormal, int maxNormal)
+    {
+        var status = GetVitalStatus(value, minNormal, maxNormal);
+        var colorClass = status switch
+        {
+            "low" => "color: #2563eb; background: #dbeafe;",
+            "high" => "color: #dc2626; background: #fecaca;",
+            _ => "color: #059669; background: #d1fae5;"
+        };
+        return $"padding: 1rem; border-radius: 0.5rem; {colorClass}";
+    }
+
+    private string GetVitalStatus(int value, int minNormal, int maxNormal)
+    {
+        if (value < minNormal) return "low";
+        if (value > maxNormal) return "high";
+        return "normal";
+    }
+}

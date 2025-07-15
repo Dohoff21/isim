@@ -1,0 +1,25 @@
+@if (IsLoading)
+{
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+        <div style="text-align: center;">
+            <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+            <MudText Typo="Typo.h6" Style="margin-top: 1rem;">Loading REALITi scenario...</MudText>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+        <MudCard Style="width: 100%; max-width: 28rem;">
+            <MudCardContent Style="padding: 1.5rem; text-align: center;">
+                <MudText Color="Color.Error">Failed to load scenario data</MudText>
+                <MudText Typo="Typo.body2" Style="margin-top: 0.5rem;">@ErrorMessage</MudText>
+            </MudCardContent>
+        </MudCard>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+}

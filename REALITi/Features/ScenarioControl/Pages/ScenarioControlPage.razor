@@ -1,0 +1,193 @@
+@page "/"
+@using System.Text.Json
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<PageTitle>REALITi - Scenario Controller</PageTitle>
+
+<div style="min-height: 100vh; background: #f8fafc; display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 20px;">
+    <LoadingStateComponent IsLoading="@viewModel.IsLoading" ErrorMessage="@viewModel.ErrorMessage" />
+    
+    @if (viewModel.IsLoaded && CurrentEvent != null)
+    {
+        <MudGrid Spacing="1" Style="margin-bottom: 8px;">
+            <MudItem xs="12" sm="8" md="8" lg="8" xl="8">
+                <ScenarioHeaderCard 
+                    Scenario="@viewModel.Scenario" 
+                    CurrentEventIndex="@viewModel.CurrentEventIndex" 
+                    ShowScenarioDetails="@showScenarioDetails" 
+                    ElapsedTimeString="@GetElapsedTimeString()" 
+                    ProgressPercentage="@GetProgress()" 
+                    OnToggleScenarioDetails="@ToggleScenarioDetails" />
+            </MudItem>
+
+            <MudItem xs="12" sm="4" md="4" lg="4" xl="4">
+                <NavigationControlsCard 
+                    CanGoNext="@CanGoNext" 
+                    CanGoPrevious="@CanGoPrevious" 
+                    CurrentEventIndex="@viewModel.CurrentEventIndex" 
+                    OnNextEvent="@NextEvent" 
+                    OnPreviousEvent="@PreviousEvent" 
+                    OnResetScenario="@ResetScenario" />
+            </MudItem>
+        </MudGrid>
+        
+        <MudGrid Spacing="1" Style="flex: 1;">
+            <MudItem xs="12" sm="8" md="8" lg="8" xl="8">
+                <CurrentEventCard 
+                    CurrentEvent="@CurrentEvent" 
+                    ChecklistItems="@GetCurrentChecklistItems()" />
+            </MudItem>
+            
+            <MudItem xs="12" sm="4" md="4" lg="4" xl="4">
+                <EventTimelineCard 
+                    Events="@viewModel.Scenario.ScenarioEvents" 
+                    CurrentEventIndex="@viewModel.CurrentEventIndex" 
+                    OnJumpToEvent="@JumpToEvent" />
+            </MudItem>
+        </MudGrid>
+    }
+</div>
+
+@code {
+    private ScenarioViewModel viewModel = new();
+    private bool showScenarioDetails = false;
+
+    private ScenarioEvent? CurrentEvent => viewModel.Scenario?.ScenarioEvents != null && viewModel.Scenario.ScenarioEvents.Count > viewModel.CurrentEventIndex ? viewModel.Scenario.ScenarioEvents[viewModel.CurrentEventIndex] : null;
+    private bool CanGoNext => viewModel.Scenario?.ScenarioEvents != null && viewModel.CurrentEventIndex < viewModel.Scenario.ScenarioEvents.Count - 1;
+    private bool CanGoPrevious => viewModel.CurrentEventIndex > 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadScenario();
+    }
+
+    private async Task LoadScenario()
+    {
+        viewModel.IsLoading = true;
+        viewModel.ErrorMessage = null;
+
+        try
+        {
+            var jsonString = await Http.GetStringAsync("data/scenario.json");
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var scenario = JsonSerializer.Deserialize<Scenario>(jsonString, options);
+            
+            if (scenario != null && scenario.ScenarioEvents != null && scenario.ScenarioEvents.Count > 0)
+            {
+                viewModel.Scenario = scenario;
+                viewModel.IsLoaded = true;
+                viewModel.CurrentEventIndex = 0;
+                
+                await Task.Delay(100);
+                await ScrollToCurrentEvent();
+            }
+            else
+            {
+                viewModel.ErrorMessage = "Failed to deserialize scenario data or no events found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            viewModel.ErrorMessage = $"Error loading scenario: {ex.Message}";
+        }
+        finally
+        {
+            viewModel.IsLoading = false;
+        }
+    }
+
+    private async Task NextEvent()
+    {
+        if (CanGoNext)
+        {
+            viewModel.CurrentEventIndex++;
+            await InvokeAsync(StateHasChanged);
+            await ScrollToCurrentEvent();
+        }
+    }
+
+    private async Task PreviousEvent()
+    {
+        if (CanGoPrevious)
+        {
+            viewModel.CurrentEventIndex--;
+            await InvokeAsync(StateHasChanged);
+            await ScrollToCurrentEvent();
+        }
+    }
+
+    private async Task ResetScenario()
+    {
+        viewModel.CurrentEventIndex = 0;
+        await InvokeAsync(StateHasChanged);
+        await ScrollToCurrentEvent();
+    }
+
+    private async Task JumpToEvent(int eventIndex)
+    {
+        if (viewModel.Scenario?.ScenarioEvents != null && eventIndex >= 0 && eventIndex < viewModel.Scenario.ScenarioEvents.Count)
+        {
+            viewModel.CurrentEventIndex = eventIndex;
+            await InvokeAsync(StateHasChanged);
+            await ScrollToCurrentEvent();
+        }
+    }
+
+    private async Task ScrollToCurrentEvent()
+    {
+        try
+        {
+            var elementId = $"timeline-event-{viewModel.CurrentEventIndex}";
+            await JSRuntime.InvokeVoidAsync("scrollToElement", elementId);
+        }
+        catch (Exception)
+        {
+            // Ignore scroll errors
+        }
+    }
+
+    private async Task ToggleScenarioDetails()
+    {
+        showScenarioDetails = !showScenarioDetails;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private double GetProgress()
+    {
+        if (viewModel.Scenario?.ScenarioEvents == null || viewModel.Scenario.ScenarioEvents.Count == 0)
+            return 0;
+        return ((double)(viewModel.CurrentEventIndex + 1) / viewModel.Scenario.ScenarioEvents.Count) * 100;
+    }
+
+    private string GetElapsedTimeString()
+    {
+        if (viewModel.Scenario?.ScenarioEvents == null) return "0:00";
+        
+        var elapsedTime = viewModel.Scenario.ScenarioEvents
+            .Take(viewModel.CurrentEventIndex + 1)
+            .Sum(e => e.TrendTime);
+        
+        return $"{elapsedTime / 60}:{(elapsedTime % 60):D2}";
+    }
+
+    private int GetNextEventDuration()
+    {
+        if (viewModel.Scenario?.ScenarioEvents == null || !CanGoNext) return 0;
+        return viewModel.Scenario.ScenarioEvents[viewModel.CurrentEventIndex + 1].TrendTime;
+    }
+
+    private List<ChecklistItem> GetCurrentChecklistItems()
+    {
+        if (CurrentEvent == null || viewModel.Scenario?.Checklist == null) return new List<ChecklistItem>();
+        
+        return CurrentEvent.RelatedChecklist
+            .Where(index => index < viewModel.Scenario.Checklist.Count)
+            .Select(index => viewModel.Scenario.Checklist[index])
+            .ToList();
+    }
+
+}

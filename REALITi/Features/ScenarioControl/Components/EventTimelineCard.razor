@@ -1,0 +1,86 @@
+<MudCard Style="height: 100%; background: white;">
+    <MudCardContent Style="overflow-y: auto; height: 100%; max-height: 400px; padding: 8px; background: white;">
+        <MudStack Spacing="1">
+        @for (int i = 0; i < Events.Count; i++)
+        {
+            var eventIndex = i;
+            var scenarioEvent = Events[i];
+            var isActive = i == CurrentEventIndex;
+            var isCompleted = i < CurrentEventIndex;
+
+            <MudPaper @onclick="() => HandleJumpToEvent(eventIndex)" 
+                     Style="@($"{GetTimelineEventStyle(isActive, isCompleted)} cursor: pointer; transition: all 0.2s;")"
+                     Class="pa-2"
+                     id="@($"timeline-event-{eventIndex}")">
+                <MudStack Spacing="1">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                        <MudAvatar Size="Size.Small" Style="@GetTimelineEventNumberStyle(isActive, isCompleted)">
+                            @(i + 1)
+                        </MudAvatar>
+                        @if (isActive)
+                        {
+                            <MudChip Color="Color.Primary" Size="Size.Small">Current</MudChip>
+                        }
+                        else if (isCompleted)
+                        {
+                            <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Outlined">Done</MudChip>
+                        }
+                    </MudStack>
+                    
+                    <MudText Typo="Typo.body1" Style="@($"{GetTimelineEventTextStyle(isActive)} font-weight: 600;")">
+                        @scenarioEvent.Name
+                    </MudText>
+                    
+                    <MudText Typo="Typo.body2" Style="color: #6b7280; line-height: 1.2;">
+                        @scenarioEvent.Description
+                    </MudText>
+                    
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Wrap="Wrap.Wrap">
+                        <MudText Typo="Typo.caption" Style="color: #6b7280;">@scenarioEvent.TrendTime s</MudText>
+                        <MudText Typo="Typo.caption" Style="color: #dc2626; font-weight: 500;">HR: @scenarioEvent.Parameters.HeartRate</MudText>
+                        <MudText Typo="Typo.caption" Style="color: #2563eb; font-weight: 500;">
+                            BP: @scenarioEvent.Parameters.BloodPressureSystolic/@scenarioEvent.Parameters.BloodPressureDiastolic
+                        </MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        }
+    </MudStack>
+</MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public List<ScenarioEvent> Events { get; set; } = new();
+    [Parameter] public int CurrentEventIndex { get; set; }
+    [Parameter] public EventCallback<int> OnJumpToEvent { get; set; }
+
+    private async Task HandleJumpToEvent(int eventIndex)
+    {
+        await OnJumpToEvent.InvokeAsync(eventIndex);
+    }
+
+    private string GetTimelineEventStyle(bool isActive, bool isCompleted)
+    {
+        if (isActive)
+            return "background: #dbeafe; border-color: #93c5fd;";
+        if (isCompleted)
+            return "background: #dcfce7; border-color: #bbf7d0;";
+        return "background: #f9fafb; border-color: #e5e7eb;";
+    }
+
+    private string GetTimelineEventNumberStyle(bool isActive, bool isCompleted)
+    {
+        var baseStyle = "width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700;";
+        
+        if (isActive)
+            return $"{baseStyle} background: #2563eb; color: white;";
+        if (isCompleted)
+            return $"{baseStyle} background: #059669; color: white;";
+        return $"{baseStyle} background: #d1d5db; color: #6b7280;";
+    }
+
+    private string GetTimelineEventTextStyle(bool isActive)
+    {
+        return isActive ? "color: #1e3a8a; font-weight: 600;" : "color: #111827;";
+    }
+}

@@ -1,0 +1,72 @@
+<MudPaper Class="pa-4" Style="background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-bottom: 1px solid #e5e7eb; height: 100%;">
+    <MudStack Spacing="3">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                <div style="width: 0.75rem; height: 0.75rem; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                <MudText Typo="Typo.h6" Style="color: #111827; font-weight: 600;">
+                    @Scenario.ScenarioName
+                </MudText>
+            </MudStack>
+            <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="HandleToggleScenarioDetails">
+                @(ShowScenarioDetails ? "Hide" : "Info")
+            </MudButton>
+        </MudStack>
+        
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4" Style="color: #4b5563;">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="Icons.Material.Filled.Person" Size="Size.Small"/>
+                <MudText Typo="Typo.body2" Style="font-weight: 500;">
+                    @Scenario.PatientInformation.Name, @Scenario.PatientInformation.Age y
+                </MudText>
+            </MudStack>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="Icons.Material.Filled.Schedule" Size="Size.Small"/>
+                <MudText Typo="Typo.body2" Style="font-weight: 500;">
+                    @ElapsedTimeString
+                </MudText>
+            </MudStack>
+        </MudStack>
+
+        <MudText Typo="Typo.body2" Style="color: #374151;">
+            <strong>Condition:</strong> @Scenario.PatientInformation.Condition
+        </MudText>
+        
+        @if (ShowScenarioDetails)
+        {
+            <MudPaper Style="background: #f9fafb;" Class="pa-3">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.body2" Style="color: #374151;">
+                        <strong>Purpose:</strong> @Scenario.Purpose
+                    </MudText>
+                    <MudText Typo="Typo.body2" Style="color: #374151;">
+                        <strong>SBAR Assessment:</strong> @Scenario.Handover.SBAR.Assessment
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        }
+        
+        <MudStack Spacing="2">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" Style="color: #6b7280;">
+                <MudText Typo="Typo.body2" Style="font-weight: 500;">
+                    Event @(CurrentEventIndex + 1) of @(Scenario?.ScenarioEvents?.Count ?? 0)
+                </MudText>
+                <MudText Typo="Typo.body2" Style="font-weight: 500;">@Math.Round(ProgressPercentage)% Complete</MudText>
+            </MudStack>
+            <MudProgressLinear Color="Color.Primary" Value="@ProgressPercentage" Size="Size.Medium"/>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public Scenario Scenario { get; set; } = null!;
+    [Parameter] public int CurrentEventIndex { get; set; }
+    [Parameter] public bool ShowScenarioDetails { get; set; }
+    [Parameter] public string ElapsedTimeString { get; set; } = string.Empty;
+    [Parameter] public double ProgressPercentage { get; set; }
+    [Parameter] public EventCallback OnToggleScenarioDetails { get; set; }
+
+    private async Task HandleToggleScenarioDetails()
+    {
+        await OnToggleScenarioDetails.InvokeAsync();
+    }
+}

@@ -1,0 +1,71 @@
+<MudPaper Class="pa-4" Style="height: 100%;">
+    <MudStack Spacing="3" Justify="Justify.Center" Style="height: 100%;">
+        <MudButton
+            Variant="Variant.Filled"
+            Color="@(CanGoNext ? Color.Success : Color.Default)"
+            Size="Size.Large"
+            OnClick="HandleNextEvent"
+            Disabled="@(!CanGoNext)"
+            Style="height: 3.5rem; font-size: 1.1rem; font-weight: 600;"
+            FullWidth="true"
+            StartIcon="@(CanGoNext ? Icons.Material.Filled.ChevronRight : Icons.Material.Filled.PlayArrow)">
+            @if (CanGoNext)
+            {
+                <text>Next Event</text>
+            }
+            else
+            {
+                <text>Scenario Complete</text>
+            }
+        </MudButton>
+        
+        <MudStack Row="true" Spacing="2">
+            <MudButton
+                Variant="Variant.Outlined"
+                Color="Color.Secondary"
+                Size="Size.Medium"
+                OnClick="HandlePreviousEvent"
+                Disabled="@(!CanGoPrevious)"
+                Style="height: 3rem; background: white;"
+                FullWidth="true"
+                StartIcon="@Icons.Material.Filled.SkipPrevious">
+                Previous
+            </MudButton>
+            <MudButton
+                Variant="Variant.Outlined"
+                Color="Color.Info"
+                Size="Size.Medium"
+                OnClick="HandleResetScenario"
+                Disabled="@(CurrentEventIndex == 0)"
+                Style="height: 3rem; background: white;"
+                FullWidth="true"
+                StartIcon="@Icons.Material.Filled.Refresh">
+                Restart
+            </MudButton>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public bool CanGoNext { get; set; }
+    [Parameter] public bool CanGoPrevious { get; set; }
+    [Parameter] public int CurrentEventIndex { get; set; }
+    [Parameter] public EventCallback OnNextEvent { get; set; }
+    [Parameter] public EventCallback OnPreviousEvent { get; set; }
+    [Parameter] public EventCallback OnResetScenario { get; set; }
+
+    private async Task HandleNextEvent()
+    {
+        await OnNextEvent.InvokeAsync();
+    }
+
+    private async Task HandlePreviousEvent()
+    {
+        await OnPreviousEvent.InvokeAsync();
+    }
+
+    private async Task HandleResetScenario()
+    {
+        await OnResetScenario.InvokeAsync();
+    }
+}
