@@ -5,7 +5,7 @@
 
 <PageTitle>REALITi - Scenario Controller</PageTitle>
 
-<div style="min-height: 100vh; background: #f8fafc; display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 20px;">
+<div style="min-height: 100vh; background: #f8fafc; display: flex; flex-direction: column; padding-bottom: 20px;">
     <LoadingStateComponent IsLoading="@viewModel.IsLoading" ErrorMessage="@viewModel.ErrorMessage" />
     
     @if (viewModel.IsLoaded && CurrentEvent != null)
@@ -32,7 +32,7 @@
             </MudItem>
         </MudGrid>
         
-        <MudGrid Spacing="1" Style="flex: 1;">
+        <MudGrid Spacing="1" Style="display: flex; align-items: stretch;">
             <MudItem xs="12" sm="8" md="8" lg="8" xl="8">
                 <CurrentEventCard 
                     CurrentEvent="@CurrentEvent" 
