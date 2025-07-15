@@ -55,7 +55,7 @@ that may run on-premise, air-gapped, or in various cloud environments.
 
 ## Key Dependencies
 
-- **MudBlazor** (6.11.0): Material Design component library providing rich UI components
+- **MudBlazor** (8.9.0): Material Design component library providing rich UI components
 - **Blazored.LocalStorage** (4.4.0): Browser local storage integration for data persistence
 - **Blazored.SessionStorage** (2.4.0): Browser session storage integration
 - **Bootstrap**: CSS framework for responsive design and layout

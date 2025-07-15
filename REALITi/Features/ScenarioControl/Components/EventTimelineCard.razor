@@ -19,11 +19,11 @@
                         </MudAvatar>
                         @if (isActive)
                         {
-                            <MudChip Color="Color.Primary" Size="Size.Small">Current</MudChip>
+                            <MudChip T="string" Color="Color.Primary" Size="Size.Small">Current</MudChip>
                         }
                         else if (isCompleted)
                         {
-                            <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Outlined">Done</MudChip>
+                            <MudChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Outlined">Done</MudChip>
                         }
                     </MudStack>
                     

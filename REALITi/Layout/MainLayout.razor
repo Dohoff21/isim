@@ -23,7 +23,7 @@
 @code {
     private readonly MudTheme _theme = new()
     {
-        Palette = new PaletteLight()
+        PaletteLight = new PaletteLight()
         {
             Primary = "#1976d2",          
             Secondary = "#dc004e",        
@@ -36,24 +36,6 @@
             AppbarBackground = "#1976d2", 
             TextPrimary = "#212121",      
             TextSecondary = "#757575"     
-        },
-        Typography = new Typography()
-        {
-            Default = new Default()
-            {
-                FontFamily = new[] { "Roboto", "Arial", "sans-serif" },
-                FontSize = "0.875rem",
-                FontWeight = 400,
-                LineHeight = 1.43,
-                LetterSpacing = "0.01071em"
-            },
-            H6 = new H6()
-            {
-                FontSize = "1.25rem",
-                FontWeight = 500,
-                LineHeight = 1.6,
-                LetterSpacing = "0.0075em"
-            }
         }
     };
 }
